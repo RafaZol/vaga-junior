@@ -11,7 +11,8 @@ package exercicioMeritoBeans;
 public class BombaBean {
     
     private long id;
-    private String combustivel;
+    private long combustivel;
+    private String combustivelAux;
     
     public long getId(){
         return id;
@@ -21,12 +22,19 @@ public class BombaBean {
         this.id = id;
     }
     
-    public String getCombustivel(){
+    public long getCombustivel(){
         return combustivel;
     }
     
-    public void setCombustivel(String combustivel){
+    public void setCombustivel(long combustivel){
         this.combustivel = combustivel;
     }
     
+    public String getCombustivelNome() {
+    return combustivelAux;
+}
+
+public void setCombustivelAux(String combustivelAux) {
+    this.combustivelAux = combustivelAux;
+}
 }

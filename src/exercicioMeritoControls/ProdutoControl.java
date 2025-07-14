@@ -141,7 +141,7 @@ public class ProdutoControl {
             pstm = conn.prepareStatement(cadastraBomba);
             
             pstm.setLong(1, bomba.getId());
-            pstm.setString(2, bomba.getCombustivel());
+            pstm.setLong(2, bomba.getCombustivel());
             
             int rs = pstm.executeUpdate();
             if(commit){
@@ -162,7 +162,7 @@ public class ProdutoControl {
         try {
             pstm = conn.prepareStatement(alteraBomba);
             
-            pstm.setString(1, bomba.getCombustivel());
+            pstm.setLong(1, bomba.getCombustivel());
             pstm.setLong(2, bomba.getId());
 
             
@@ -191,8 +191,8 @@ public class ProdutoControl {
     public BombaBean preencheBombaBemn(ResultSet rs){
         BombaBean bomba = new BombaBean();
         try {
-            bomba.setId(rs.getLong("bb_id"));
-            bomba.setCombustivel(rs.getString("bb_combustivel"));
+            bomba.setId(rs.getLong("bomba_id"));
+            bomba.setCombustivelAux(rs.getString("combustivel_nome"));
         } catch (SQLException sx){
             sx.printStackTrace();
         }

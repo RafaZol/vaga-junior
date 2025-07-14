@@ -41,6 +41,7 @@ public class Menu extends javax.swing.JFrame {
         jmUsu = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jmCadProdutos = new javax.swing.JMenuItem();
+        jmCadBombas = new javax.swing.JMenuItem();
         jmPdv = new javax.swing.JMenu();
         jmPay = new javax.swing.JMenuItem();
 
@@ -75,6 +76,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jmCadProdutos);
+
+        jmCadBombas.setText("Cadastro de Bombas");
+        jmCadBombas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmCadBombasActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jmCadBombas);
 
         jMenuBar1.add(jMenu2);
 
@@ -122,6 +131,10 @@ public class Menu extends javax.swing.JFrame {
         cadastrarUsuario();
     }//GEN-LAST:event_jmUsuActionPerformed
 
+    private void jmCadBombasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmCadBombasActionPerformed
+        cadastrarBombas();
+    }//GEN-LAST:event_jmCadBombasActionPerformed
+
     private void cadastrarPessoa(){
         CadPessoas pessoa = new CadPessoas();
         pessoa.pack();
@@ -144,6 +157,14 @@ public class Menu extends javax.swing.JFrame {
         prod.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         prod.setLocationRelativeTo(null);
         prod.setVisible(true);
+    }
+    
+    private void cadastrarBombas(){
+        CadBomba b = new CadBomba();
+        b.pack();
+        b.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        b.setLocationRelativeTo(null);
+        b.setVisible(true);
     }
     
     /**
@@ -203,6 +224,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jmCadBombas;
     private javax.swing.JMenuItem jmCadPessoa;
     private javax.swing.JMenuItem jmCadProdutos;
     private javax.swing.JMenuItem jmPay;
