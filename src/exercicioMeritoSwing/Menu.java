@@ -96,11 +96,11 @@ public class Menu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGap(0, 575, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 277, Short.MAX_VALUE)
+            .addGap(0, 372, Short.MAX_VALUE)
         );
 
         pack();
@@ -111,7 +111,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_jmCadPessoaActionPerformed
 
     private void jmCadProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmCadProdutosActionPerformed
-        //cadastrarProduto();       
+        cadastraProduto();       
     }//GEN-LAST:event_jmCadProdutosActionPerformed
 
     private void jmPayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmPayActionPerformed
@@ -125,7 +125,7 @@ public class Menu extends javax.swing.JFrame {
     private void cadastrarPessoa(){
         CadPessoas pessoa = new CadPessoas();
         pessoa.pack();
-        pessoa.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        pessoa.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pessoa.setLocationRelativeTo(null);
         pessoa.setVisible(true); 
     }
@@ -136,6 +136,14 @@ public class Menu extends javax.swing.JFrame {
         usu.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         usu.setLocationRelativeTo(null);
         usu.setVisible(true);
+    }
+    
+    private void cadastraProduto(){
+        CadProdutos prod = new CadProdutos();
+        prod.pack();
+        prod.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        prod.setLocationRelativeTo(null);
+        prod.setVisible(true);
     }
     
     /**

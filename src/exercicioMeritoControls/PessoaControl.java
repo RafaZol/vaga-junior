@@ -178,7 +178,7 @@ public class PessoaControl {
         if(i == 0){
             sql = "SELECT MAX(tb_pessoa_id) AS ultimo_id FROM tb_pessoas";
         } else if (i == 1) {
-            sql = "SELECT MAX(usu_id) AS ultimo_id FROM userss";
+            sql = "SELECT MAX(usu_id) AS ultimo_id FROM users";
         } else {
             JOptionPane.showMessageDialog(null, "Erro ao cadastrar usuário");
         }   

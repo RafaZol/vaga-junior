@@ -11,6 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,17 +24,29 @@ public class ProdutoControl {
     private PreparedStatement pstm;
     private ResultSet rs;
     
-    private String cadastraProduto = "INSERT INTO";
+    private String cadastraProduto = "INSERT INTO public.tb_combustivel (\n"
+            + " com_id,"
+            + " com_nome,\n"
+            + " com_preco)\n"
+            + " VALUES (?, ?, ?)";
     
-    private String cadastraBomba = "INSERT INTO";
+    private String cadastraBomba = "INSERT INTO tb_bomba (\n"
+            + " bb_id,\n"
+            + " bb_combustivel)\n"
+            + " VALUES (?, ?)";
     
-    private String alteraProduto = "UPDATE SET";
+    private String alteraProduto = "UPDATE tb_combustivel SET"
+            + " com_nome = ?,"
+            + " com_preco = ?"
+            + " WHERE com_id = ?";
     
-    private String alteraBomba = "UPDATE SET";
+    private String alteraBomba = "UPDATE tb_bomba SET"
+            + " bb_combustivel = ?"
+            + " WHERE bb_id = ?";
     
-    private String excluiProduto = "DELETE FROM";
+    private String excluiProduto = "DELETE FROM tb_combustivel WHERE com_id = ?";
     
-    private String excluiBomba = "DELETE FROM";
+    private String excluiBomba = "DELETE FROM tb_bomba WHERE bb_id = ?";
 
     public long cadastraProduto(ProdutoBean prod){
         return cadastraProduto(prod, Conexao.getConnPublic(), true);
@@ -161,12 +176,12 @@ public class ProdutoControl {
         return regs > 0;
     }
     
-    public ProdutoBean preenchePreodutoBean(ResultSet rs){
+    public ProdutoBean preencheProdutoBean(ResultSet rs){
         ProdutoBean prod = new ProdutoBean();
         try {
-            prod.setId(rs.getLong(""));
-            prod.setNome(rs.getString(""));
-            prod.setValor(rs.getDouble(""));
+            prod.setId(rs.getLong("com_id"));
+            prod.setNome(rs.getString("com_nome"));
+            prod.setValor(rs.getDouble("com_preco"));
         } catch (SQLException sx){
             sx.printStackTrace();
         }
@@ -176,12 +191,72 @@ public class ProdutoControl {
     public BombaBean preencheBombaBemn(ResultSet rs){
         BombaBean bomba = new BombaBean();
         try {
-            bomba.setId(rs.getLong(""));
-            bomba.setCombustivel(rs.getString(""));
+            bomba.setId(rs.getLong("bb_id"));
+            bomba.setCombustivel(rs.getString("bb_combustivel"));
         } catch (SQLException sx){
             sx.printStackTrace();
         }
         return bomba;
     }
     
+    public List<ProdutoBean> listarSQL(String sql){
+        return listarSQL(sql,Conexao.getConnPublic());
+    }
+    
+    public List<ProdutoBean> listarSQL(String sql, Connection conn){
+        List<ProdutoBean> lista = new ArrayList<>();
+        try{
+            pstm = conn.prepareStatement(sql);
+            rs = pstm.executeQuery();
+            while(rs.next()){
+                lista.add(preencheProdutoBean(rs));
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return lista;
+    }
+    
+    public List<BombaBean> listarSQL(String sql, String aux){
+        return listarSQL(sql, aux, Conexao.getConnPublic());
+    }
+    
+    public List<BombaBean> listarSQL(String sql, String aux, Connection conn){
+        List<BombaBean> lista = new ArrayList<>();
+        try{
+            pstm = conn.prepareStatement(sql);
+            rs = pstm.executeQuery();
+            while(rs.next()){
+                lista.add(preencheBombaBemn(rs));
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return lista;
+    }
+    
+    public long gerarId(int i){
+        return gerarId(i, Conexao.getConnPublic());
+    }
+    public long gerarId(int i, Connection conn){
+        String sql = "";
+        if(i==0){
+            sql = "SELECT MAX(com_id) AS ultimo_id FROM tb_combustivel";
+        } else if(i==1){ 
+            sql = "SELECT MAX(bb_id) AS ultimo_id FROM tb_bomba";
+        } else {
+            JOptionPane.showMessageDialog(null, "Erro ao cadastrar");
+        }
+        try {
+            PreparedStatement pstm  = conn.prepareStatement(sql);
+            ResultSet rs = pstm.executeQuery();
+            
+            if(rs.next()){
+                return rs.getInt("ultimo_id")+1;            
+            }
+        } catch (SQLException sx){
+            sx.printStackTrace();
+        }
+        return 0;
+    }
 }
