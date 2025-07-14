@@ -1,15 +1,21 @@
 package exercicioMeritoSwing;
 
+import exercicioMeritoControls.PessoaControl;
+import exercicioMeritoTools.Tools;
 import java.awt.Image;
 import java.awt.Toolkit;
+import javax.sound.midi.Soundbank;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 /**
  *
  * @author Rafael
  */
 public class Login extends javax.swing.JFrame {
+    
+    private final PessoaControl pessoaControl = new PessoaControl();
 
     /**
      * Creates new form Login
@@ -156,7 +162,27 @@ public class Login extends javax.swing.JFrame {
     }
     
     private void login(){
-        
+        try {
+            String cripto;
+            cripto = Tools.Cripto(pfPass.getText());            
+            if(pessoaControl.vereficaCredenciais(tfName.getText(),cripto)){
+                abreTela();
+            } else {
+                JOptionPane.showMessageDialog(null, "Usuário ou senha não encontrados");
+            }
+        } catch (Exception ex){
+            System.out.println("ERRO : " + ex);
+        }
+    }
+    
+    private void abreTela(){
+        this.dispose();
+        Menu menu = new Menu();
+        menu.pack();
+        menu.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        menu.setLocationRelativeTo(null);
+        menu.setVisible(true); 
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
