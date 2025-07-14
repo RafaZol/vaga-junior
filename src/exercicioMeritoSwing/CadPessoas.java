@@ -54,10 +54,10 @@ public class CadPessoas extends javax.swing.JFrame {
         tbConsultas.getColumnModel().getColumn(0).setCellRenderer(direita);
         tbConsultas.setAutoCreateRowSorter(true);
         tbConsultas.getSelectionModel().addListSelectionListener(e -> {
-    if (!e.getValueIsAdjusting()) {
-        tbConsultaLinhaSelecionada(tbConsultas);
-    }
-});
+            if (!e.getValueIsAdjusting()) {
+                tbConsultaLinhaSelecionada(tbConsultas);
+            }
+        });
         listar();
         
     }
@@ -306,7 +306,7 @@ public class CadPessoas extends javax.swing.JFrame {
                 pessoaBean.setTelefone(Long.parseLong(tfTelefone.getText()));
                 if(tipoDocumento()){
                     if(tfId.getText().trim().isEmpty()){
-                        pessoaBean.setId(pessoaControl.gerarId(Conexao.getConnPublic()));
+                        pessoaBean.setId(pessoaControl.gerarId(0));
                         pessoaControl.cadastrar(pessoaBean);
                         limparCampos();
                     } else {

@@ -6,11 +6,12 @@ package exercicioMeritoSwing;
 
 import javax.swing.ImageIcon;
 import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.WindowConstants;
 
 /**
  *
- * @author Victória
+ * @author Rafael
  */
 public class Menu extends javax.swing.JFrame {
 
@@ -20,7 +21,9 @@ public class Menu extends javax.swing.JFrame {
     public Menu() {
         initComponents();
         menuInitAction();
-        
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Image img = kit.getImage("mercado.png");
+        this.setIconImage(img);
     }
 
     /**
@@ -35,6 +38,7 @@ public class Menu extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jmCadPessoa = new javax.swing.JMenuItem();
+        jmUsu = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jmCadProdutos = new javax.swing.JMenuItem();
         jmPdv = new javax.swing.JMenu();
@@ -51,6 +55,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jmCadPessoa);
+
+        jmUsu.setText("Cadastro de Usuário");
+        jmUsu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmUsuActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jmUsu);
 
         jMenuBar1.add(jMenu1);
 
@@ -106,12 +118,24 @@ public class Menu extends javax.swing.JFrame {
         // abrirPDV();
     }//GEN-LAST:event_jmPayActionPerformed
 
+    private void jmUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmUsuActionPerformed
+        cadastrarUsuario();
+    }//GEN-LAST:event_jmUsuActionPerformed
+
     private void cadastrarPessoa(){
         CadPessoas pessoa = new CadPessoas();
         pessoa.pack();
         pessoa.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pessoa.setLocationRelativeTo(null);
         pessoa.setVisible(true); 
+    }
+    
+    private void cadastrarUsuario(){
+        CadUsu usu = new CadUsu();
+        usu.pack();
+        usu.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        usu.setLocationRelativeTo(null);
+        usu.setVisible(true);
     }
     
     /**
@@ -175,5 +199,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem jmCadProdutos;
     private javax.swing.JMenuItem jmPay;
     private javax.swing.JMenu jmPdv;
+    private javax.swing.JMenuItem jmUsu;
     // End of variables declaration//GEN-END:variables
 }
