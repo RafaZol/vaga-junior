@@ -285,8 +285,8 @@ public class CadUsu extends javax.swing.JFrame {
                 if(tfId.getText().trim().isEmpty()){
                     if(tfPass.getText().trim() == tfPass2.getText().trim() && !tfPass.getText().trim().isEmpty()){
                         String pass = Tools.Cripto(tfPass.getText().trim());
-                        user.setPass(pass);
-                        user.setUserId(pessoaControl.gerarId(1));
+                        user.setPass(pass);                        
+                        user.setUserId(Tools.gerarId("usu_id","users"));
                         pessoaControl.cadastraUser(user);
                         limparCampos();                       
                     } else {

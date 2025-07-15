@@ -6,6 +6,7 @@ package exercicioMeritoSwing;
 
 import exercicioMeritoBeans.ProdutoBean;
 import exercicioMeritoControls.ProdutoControl;
+import exercicioMeritoTools.Tools;
 import java.awt.Toolkit;
 import java.util.List;
 import javax.swing.ListSelectionModel;
@@ -203,7 +204,7 @@ public class CadProdutos extends javax.swing.JFrame {
                 bean.setValor(Double.parseDouble(tfValor.getText()));
                 
                 if(tfId.getText().trim().isEmpty()){
-                    bean.setId(produtoControl.gerarId(0));
+                    bean.setId(Tools.gerarId("com_id","tb_combustivel"));
                     produtoControl.cadastraProduto(bean);
                     limparCampos();
                 } else {

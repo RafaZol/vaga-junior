@@ -7,6 +7,7 @@ package exercicioMeritoSwing;
 import exercicioMeritoBeans.PessoaBean;
 import exercicioMeritoConnections.Conexao;
 import exercicioMeritoControls.PessoaControl;
+import exercicioMeritoTools.Tools;
 import java.awt.Toolkit;
 import java.awt.Image;
 import javax.swing.JOptionPane;
@@ -289,7 +290,7 @@ public class CadPessoas extends javax.swing.JFrame {
                 pessoaBean.setTelefone(Long.parseLong(tfTelefone.getText()));
                 if(tipoDocumento()){
                     if(tfId.getText().trim().isEmpty()){
-                        pessoaBean.setId(pessoaControl.gerarId(0));
+                        pessoaBean.setId(Tools.gerarId("tb_pessoa_id","tb_pessoas"));
                         pessoaControl.cadastrar(pessoaBean);
                         limparCampos();
                     } else {

@@ -169,33 +169,6 @@ public class PessoaControl {
         return lista;
     }
     
-    public long gerarId(int i){
-        return gerarId(i, Conexao.getConnPublic());
-    }
-    
-    public long gerarId(int i, Connection conn){
-        String sql = "";
-        if(i == 0){
-            sql = "SELECT MAX(tb_pessoa_id) AS ultimo_id FROM tb_pessoas";
-        } else if (i == 1) {
-            sql = "SELECT MAX(usu_id) AS ultimo_id FROM users";
-        } else {
-            JOptionPane.showMessageDialog(null, "Erro ao cadastrar usuário");
-        }   
-        try (
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery()) {
-
-            if (rs.next()) {
-                return rs.getInt("ultimo_id") + 1;
-            }
-
-        } catch (SQLException sx) {
-            sx.printStackTrace();
-        }
-        return 0;
-    }
-    
     public long cadastraUser(UserBean user){
         return cadastraUser(user, Conexao.getConnPublic(), true);
     }

@@ -7,6 +7,7 @@ package exercicioMeritoSwing;
 import exercicioMeritoBeans.BombaBean;
 import exercicioMeritoBeans.ProdutoBean;
 import exercicioMeritoControls.ProdutoControl;
+import exercicioMeritoTools.Tools;
 import java.awt.Toolkit;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
@@ -225,7 +226,7 @@ public class CadBomba extends javax.swing.JFrame {
                 BombaBean bean = new BombaBean();                
                 bean.setCombustivel(produtos.get(cbCombustivel.getSelectedIndex()).getId());
                 if(tfId.getText().trim().isEmpty()){
-                    bean.setId(produtoControl.gerarId(1));
+                    bean.setId(Tools.gerarId("bb_id","tb_bomba"));
                     produtoControl.cadastraBomba(bean);
                     limparCampos();
                 } else {

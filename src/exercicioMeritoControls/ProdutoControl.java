@@ -234,29 +234,4 @@ public class ProdutoControl {
         }
         return lista;
     }
-    
-    public long gerarId(int i){
-        return gerarId(i, Conexao.getConnPublic());
-    }
-    public long gerarId(int i, Connection conn){
-        String sql = "";
-        if(i==0){
-            sql = "SELECT MAX(com_id) AS ultimo_id FROM tb_combustivel";
-        } else if(i==1){ 
-            sql = "SELECT MAX(bb_id) AS ultimo_id FROM tb_bomba";
-        } else {
-            JOptionPane.showMessageDialog(null, "Erro ao cadastrar");
-        }
-        try {
-            PreparedStatement pstm  = conn.prepareStatement(sql);
-            ResultSet rs = pstm.executeQuery();
-            
-            if(rs.next()){
-                return rs.getInt("ultimo_id")+1;            
-            }
-        } catch (SQLException sx){
-            sx.printStackTrace();
-        }
-        return 0;
-    }
 }
