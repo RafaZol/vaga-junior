@@ -166,9 +166,10 @@ public class Login extends javax.swing.JFrame {
             String cripto;
             cripto = Tools.Cripto(pfPass.getText());            
             if(pessoaControl.vereficaCredenciais(tfName.getText(),cripto)){
-                abreTela();
+                abreTela();               
             } else {
                 JOptionPane.showMessageDialog(null, "Usuário ou senha não encontrados");
+                pfPass.setText("");
             }
         } catch (Exception ex){
             System.out.println("ERRO : " + ex);

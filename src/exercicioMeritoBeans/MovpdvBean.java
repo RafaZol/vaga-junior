@@ -13,13 +13,15 @@ import java.time.LocalDateTime;
 public class MovpdvBean {
     
     private long id;
-    private BombaBean bomba;
+    private long bomba;
     private float quantidade;
-    private PessoaBean cliente;
+    private long cliente;
     private String obs;
     private float valorTotal;
     private float desconto;
     private LocalDateTime hora;
+    private String combustivel;
+    private float valor;
     
     public long getId(){
         return id;
@@ -29,11 +31,11 @@ public class MovpdvBean {
         this.id = id;
     }
     
-    public BombaBean getBomba(){
+    public long getBomba(){
         return bomba;
     }
     
-    public void setBomba(BombaBean bomba){
+    public void setBomba(long bomba){
         this.bomba = bomba;
     }
     
@@ -45,11 +47,11 @@ public class MovpdvBean {
         this.quantidade = quantidade;
     }
     
-    public PessoaBean getCliente(){
+    public long getCliente(){
         return cliente;
     }
     
-    public void setCliente(PessoaBean cliente){
+    public void setCliente(long cliente){
         this.cliente = cliente;
     }
     
@@ -83,5 +85,21 @@ public class MovpdvBean {
     
     public void setHora(LocalDateTime hora){
         this.hora = hora;
+    }
+    
+    public String getCombustivelNome(){
+        return combustivel;
+    }
+    
+    public void setCombustivelNome(String combustivel){
+        this.combustivel = combustivel;
+    }
+    
+    public float getValor(){
+        return valor;
+    }
+    
+    public void setValor(float valor){
+        this.valor = valor;
     }
 }

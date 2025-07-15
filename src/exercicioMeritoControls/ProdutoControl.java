@@ -188,11 +188,17 @@ public class ProdutoControl {
         return prod;
     }
     
-    public BombaBean preencheBombaBemn(ResultSet rs){
+    public BombaBean preencheBombaBemn(ResultSet rs, String aux){
         BombaBean bomba = new BombaBean();
-        try {
-            bomba.setId(rs.getLong("bomba_id"));
-            bomba.setCombustivelAux(rs.getString("combustivel_nome"));
+        try {            
+            if(aux.equals("")){
+                bomba.setId(rs.getLong("bomba_id"));
+                bomba.setCombustivelAux(rs.getString("combustivel_nome"));
+            } else {
+                bomba.setId(rs.getLong("bb_id"));
+                bomba.setCombustivel(rs.getLong("bb_combustivel"));
+            }
+            
         } catch (SQLException sx){
             sx.printStackTrace();
         }
@@ -227,7 +233,7 @@ public class ProdutoControl {
             pstm = conn.prepareStatement(sql);
             rs = pstm.executeQuery();
             while(rs.next()){
-                lista.add(preencheBombaBemn(rs));
+                lista.add(preencheBombaBemn(rs, aux));
             }
         } catch (Exception ex){
             ex.printStackTrace();

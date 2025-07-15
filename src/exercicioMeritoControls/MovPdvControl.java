@@ -31,18 +31,20 @@ public class MovPdvControl {
     + " mov_bomba,\n" 
     + " mov_qtd,\n" 
     + " mov_cliente,\n" 
-    + " mov_obs,\n" 
+    + " mov_obs,\n"
+    + " mov_valor,\n" 
     + " mov_valor_total,\n" 
     + " mov_desc,\n" 
     + " mov_time)\n"
     + " VALUES "
-    + "(?, ?, ?, ?, ?, ?, ?, ?)";
+    + "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     private String sql_update = "UPDATE tb_mov_pdv SET \n" 
     + "mov_bomba = ?,\n" 
     + "mov_qtd = ?,\n" 
     + "mov_cliente = ?,\n" 
     + "mov_obs = ?,\n" 
+    + "mov_valor = ?,\n"        
     + "mov_valor_total = ?,\n" 
     + "mov_desc = ?\n" 
     +"WHERE mov_id = ?";
@@ -58,21 +60,22 @@ public class MovPdvControl {
         try {
             pstm = conn.prepareStatement(sql_cadastra);
             pstm.setLong(1, bean.getId());
-            pstm.setLong(2, Long.parseLong(bean.getBomba()+""));
+            pstm.setLong(2, bean.getBomba());
             pstm.setFloat(3, bean.getQuantidade());
-            if(bean.getCliente() != null){
-                pstm.setLong(4, Long.parseLong(bean.getCliente()+""));
+            if(bean.getCliente() != 0f){
+                pstm.setLong(4, bean.getCliente());
             } else {
                 pstm.setLong(4, 0);
             }
             pstm.setString(5,bean.getObs());
-            pstm.setFloat(6, bean.getValorTotal());
+            pstm.setFloat(6, bean.getValor());
+            pstm.setFloat(7, bean.getValorTotal());
             if(bean.getDesconto() != 0f){
-                pstm.setFloat(7, bean.getDesconto());
+                pstm.setFloat(8, bean.getDesconto());
             } else {
-                pstm.setFloat(7, 0f);
+                pstm.setFloat(8, 0f);
             }
-            pstm.setTimestamp(8, Timestamp.valueOf(bean.getHora()));
+            pstm.setTimestamp(9, Timestamp.valueOf(bean.getHora()));
             regs = pstm.executeUpdate();
             if(commit){
                 conn.commit();
@@ -92,21 +95,22 @@ public class MovPdvControl {
         try {
             pstm = conn.prepareStatement(sql_update);
             
-            pstm.setLong(1, Long.parseLong(bean.getBomba()+""));
+            pstm.setLong(1, bean.getBomba());
             pstm.setFloat(2, bean.getQuantidade());
-            if(bean.getCliente() != null){
-                pstm.setLong(3, Long.parseLong(bean.getCliente()+""));
+            if(bean.getCliente() != 0f){
+                pstm.setLong(3, bean.getCliente());
             } else {
                 pstm.setLong(3, 0);
             }
             pstm.setString(4,bean.getObs());
-            pstm.setFloat(5, bean.getValorTotal());
+            pstm.setFloat(5, bean.getValor());
+            pstm.setFloat(6, bean.getValorTotal());
             if(bean.getDesconto() != 0f){
-                pstm.setFloat(6, bean.getDesconto());
+                pstm.setFloat(7, bean.getDesconto());
             } else {
-                pstm.setFloat(6, 0f);
+                pstm.setFloat(7, 0f);
             }
-            pstm.setLong(7, bean.getId());
+            pstm.setLong(8, bean.getId());
             regs = pstm.executeUpdate();
             if(commit){
                 conn.commit();
@@ -137,7 +141,7 @@ public class MovPdvControl {
         return regs > 0;
     }
     
-    public MovpdvBean preencheBean(ResultSet rs){
+    public MovpdvBean preencheBean(ResultSet rs, String aux){
         MovpdvBean bean = new MovpdvBean();                
         try{            
             bean.setId(rs.getLong("mov_id"));
@@ -145,34 +149,34 @@ public class MovPdvControl {
             bean.setObs(rs.getString("mov_obs"));
             bean.setValorTotal(rs.getFloat("mov_valor_total"));
             bean.setDesconto(rs.getFloat("mov_desc"));
-            bean.setHora(rs.getTimestamp("mov_hora").toLocalDateTime());
+            bean.setHora(rs.getTimestamp("mov_time").toLocalDateTime());
             if(!rs.wasNull()){
-                PessoaBean pBean = new PessoaBean();
-                pBean.setId(rs.getLong("mov_cliente"));
-                bean.setCliente(pBean);
+                bean.setCliente(rs.getLong("mov_cliente"));
             }
-            if(!rs.wasNull()){
-                BombaBean bBean = new BombaBean();
-                bBean.setId(rs.getLong("mov_bomba"));
-                bean.setBomba(bBean);
+            if(!rs.wasNull()){                
+                bean.setBomba(rs.getLong("mov_bomba"));
             }            
+            bean.setValor(rs.getFloat("mov_valor"));
+            if(aux.equals("")){
+                bean.setCombustivelNome(rs.getString("comb_nome"));                
+            }
         } catch (SQLException sx){
             sx.printStackTrace();
         }
         return bean;
     }
     
-    public List<MovpdvBean> listarSQL(String sql){
-        return listarSQL(sql, Conexao.getConnPublic());
+    public List<MovpdvBean> listarSQL(String sql, String aux){
+        return listarSQL(sql, aux, Conexao.getConnPublic());
     }
     
-    public List<MovpdvBean> listarSQL(String sql, Connection conn){
+    public List<MovpdvBean> listarSQL(String sql, String aux, Connection conn){
         List<MovpdvBean> lista = new ArrayList<>();
         try {
             pstm = conn.prepareStatement(sql);
             rs = pstm.executeQuery();
             while(rs.next()){
-                lista.add(preencheBean(rs));
+                lista.add(preencheBean(rs, aux));
             }
         } catch (Exception ex){
             ex.printStackTrace();

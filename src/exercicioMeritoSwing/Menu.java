@@ -4,16 +4,44 @@
  */
 package exercicioMeritoSwing;
 
+import exercicioMeritoBeans.BombaBean;
+import exercicioMeritoBeans.MovpdvBean;
+import exercicioMeritoBeans.PessoaBean;
+import exercicioMeritoBeans.ProdutoBean;
+import exercicioMeritoControls.MovPdvControl;
+import exercicioMeritoControls.PessoaControl;
+import exercicioMeritoControls.ProdutoControl;
+import exercicioMeritoTools.Tools;
 import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.time.LocalDateTime;
+import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 
 /**
  *
  * @author Rafael
  */
 public class Menu extends javax.swing.JFrame {
+    
+    private final ProdutoControl produtoControl = new ProdutoControl();
+    private final PessoaControl pessoaControl = new PessoaControl();
+    private final MovPdvControl movControl = new MovPdvControl();
+    private DefaultTableModel tmConsulta = new DefaultTableModel(null, new String[]{"BOMBA", "PRODUTO",
+        "VALOR", "QUANTIA", "TOTAL" ,"DATA/HORA"});
+    private ListSelectionModel lsConsulta;
+    private final List<BombaBean> bombas;
+    private final List<PessoaBean> clientes;
+    private List<MovpdvBean> movBean;
+    private Boolean inicializando = true;
+    List<ProdutoBean> produtos;
 
     /**
      * Creates new form Menu
@@ -24,6 +52,224 @@ public class Menu extends javax.swing.JFrame {
         Toolkit kit = Toolkit.getDefaultToolkit();
         Image img = kit.getImage("mercado.png");
         this.setIconImage(img);
+        
+        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+
+        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        tbConsulta.getColumnModel().getColumn(0).setPreferredWidth(20);
+        tbConsulta.getColumnModel().getColumn(1).setPreferredWidth(20);
+        tbConsulta.getColumnModel().getColumn(2).setPreferredWidth(20);
+        tbConsulta.getColumnModel().getColumn(3).setPreferredWidth(20);
+        tbConsulta.getColumnModel().getColumn(4).setPreferredWidth(20);
+        tbConsulta.getColumnModel().getColumn(5).setPreferredWidth(20);
+        tbConsulta.getColumnModel().getColumn(0).setCellRenderer(direita);
+        tbConsulta.setAutoCreateRowSorter(true);
+        tbConsulta.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                tbConsultaLinhaSelecionada(tbConsulta);
+            }
+        });
+        
+        bombas = produtoControl.listarSQL("SELECT * FROM tb_bomba", "sql");
+        cbBomba.removeAllItems();
+        for(int i = 0; i < bombas.size(); i++){
+            cbBomba.addItem("Bomba : " + bombas.get(i).getId());
+        }
+        
+        clientes = pessoaControl.listarSQL("SELECT * FROM tb_pessoas");
+        cbCliente.removeAllItems();
+        cbCliente.addItem("Selecione o Cliente");
+        for(int i = 0; i < clientes.size(); i++){
+            cbCliente.addItem(clientes.get(i).getNome());
+        }
+        listar();   
+    }
+    
+    
+    private void limparCampos(){
+        tfId.setText("");
+        cbBomba.setSelectedIndex(0);
+        cbCliente.setSelectedIndex(0);
+        tfValor.setText("");
+        tfQuantia.setText("");
+        tfObs.setText("");
+        tfDes.setText("");
+        tfValorTotal.setText("");
+    }
+    
+    private boolean verificarCampos(){
+        if(cbBomba.getSelectedIndex() <= -1 && tfValor.getText().trim().isEmpty()
+                && tfQuantia.getText().trim().isEmpty() && tfValorTotal.getText().trim().isEmpty()){
+            JOptionPane.showMessageDialog(null, "Preencha Todos os Campos obrigatorios corretamente");
+            return false;
+        }
+        return true;
+    }
+    
+    protected void tbConsultaLinhaSelecionada(JTable tb){
+        try{
+            if(tb.getSelectedRow() != -1 && !inicializando){
+                int ls = tbConsulta.convertRowIndexToModel(tb.getSelectedRow());
+                tfId.setText(movBean.get(ls).getId()+"");
+                tfQuantia.setText(movBean.get(ls).getQuantidade()+"");
+                tfObs.setText(movBean.get(ls).getObs());
+                tfDes.setText(movBean.get(ls).getDesconto()+"");
+                tfValorTotal.setText(movBean.get(ls).getValorTotal()+"");
+                produtos = produtoControl.listarSQL("SELECT * FROM tb_combustivel");
+                for(int i = 0; i < bombas.size(); i++){
+                    BombaBean b = bombas.get(i);
+                    if(b.getId() == movBean.get(ls).getBomba()){
+                        cbBomba.setSelectedIndex(i);
+                        for(int j = 0; j < produtos.size(); j++){
+                            ProdutoBean p = produtos.get(j);
+                            if(p.getId() == b.getCombustivel()){
+                                tfValor.setText(p.getValor() + "");
+                                break;
+                            }                        
+                        }
+                    break;    
+                    }
+                }
+                for(int i = 0; i < clientes.size(); i++){
+                    PessoaBean p =clientes.get(i);
+                    if(p.getId() == movBean.get(ls).getCliente()){
+                        cbCliente.setSelectedIndex(i);
+                        break;
+                    }                    
+                }                                    
+            } else {
+                limparCampos();
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+    
+    private void mostrar(List<MovpdvBean> lista){
+        inicializando = true;
+        while(tmConsulta.getRowCount() > 0){
+            tmConsulta.removeRow(0);
+        }
+        inicializando = false;
+        String[] campos = new String[]{null, null, null, null, null, null};
+        for(int i  = 0; i < lista.size(); i++){
+            tmConsulta.addRow(campos);
+            tmConsulta.setValueAt(lista.get(i).getBomba(), i, 0);
+            tmConsulta.setValueAt(lista.get(i).getCombustivelNome(), i, 1);
+            tmConsulta.setValueAt(lista.get(i).getValor(), i, 2);
+            tmConsulta.setValueAt(lista.get(i).getQuantidade(), i, 3);
+            tmConsulta.setValueAt(lista.get(i).getValorTotal(), i, 4);
+            tmConsulta.setValueAt(lista.get(i).getHora(), i, 5);
+        }
+    }
+    
+    private void listar(){
+        try{
+            movBean = movControl.listarSQL("SELECT"                    
+                    + " m.mov_id,\n" 
+                    + " m.mov_qtd,\n" 
+                    + " m.mov_obs,\n" 
+                    + " m.mov_valor_total,\n" 
+                    + " m.mov_desc,\n" 
+                    + " m.mov_time,\n" 
+                    + " m.mov_cliente,\n" 
+                    + " m.mov_bomba,"
+                    + " m.mov_valor,\n" 
+                    + " c.com_nome AS comb_nome\n"   
+                    + "FROM tb_mov_pdv m\n" 
+                    + "JOIN tb_bomba b ON m.mov_bomba = b.bb_id\n" 
+                    + "JOIN tb_combustivel c ON b.bb_combustivel = c.com_id\n" 
+                    + "ORDER BY m.mov_time DESC", "");
+            mostrar(movBean);
+        } catch (Exception ex){
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Pesquisa : " + ex.getLocalizedMessage());
+        }
+    }
+    
+    private void finalizar(){
+        if(verificarCampos()){
+            try{
+                MovpdvBean bean = new MovpdvBean();                               
+                bean.setBomba(bombas.get(cbBomba.getSelectedIndex()).getId());
+                bean.setQuantidade(Float.parseFloat(tfQuantia.getText().replace(",", ".")));
+                bean.setValor(Float.parseFloat(tfValor.getText().replace(",", ".")));
+                bean.setValorTotal(Float.parseFloat(tfValorTotal.getText().replace(",", ".")));
+                int index = cbCliente.getSelectedIndex();
+                if (index > 0 && index <= clientes.size()) {
+                    bean.setCliente(clientes.get(index - 1).getId());
+                }
+//                bean.setCliente(clientes.get(cbCliente.getSelectedIndex()).getId());
+                bean.setDesconto(Float.parseFloat(tfDes.getText().replace(",", ".")));
+                bean.setObs(tfObs.getText());                
+                if(tfId.getText().trim().isEmpty()){
+                    bean.setId(Tools.gerarId("mov_id", "tb_mov_pdv"));
+                    bean.setHora(LocalDateTime.now());
+                    movControl.cadastraMov(bean);
+                    limparCampos();
+                } else {
+                    bean.setId(Long.parseLong(tfId.getText()));
+                    movControl.alteraMov(bean);
+                    limparCampos();
+                }
+                listar();
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Erro ao finalizar venda");
+        } 
+    }
+    
+    private void excluir(){
+        if(tbConsulta.getSelectedRow() != -1){
+            int ls = tbConsulta.convertRowIndexToModel(tbConsulta.getSelectedRow());
+            movControl.excluiMov(movBean.get(ls).getId());
+        }
+        listar();
+    }
+    
+    private void calcular(){
+        float vlU = 0f, vlT = 0f, qtd = 0f, desc = 0f;
+        try{
+            if(!tfValor.getText().trim().isEmpty()){
+                vlU = Float.parseFloat(tfValor.getText().replace(",", "."));
+            }
+            if(!tfValorTotal.getText().trim().isEmpty()){
+                vlT = Float.parseFloat(tfValorTotal.getText().replace(",", "."));
+            }
+            if(!tfQuantia.getText().trim().isEmpty()){
+                qtd = Float.parseFloat(tfQuantia.getText().replace(",", "."));
+            }
+            if(!tfDes.getText().trim().isEmpty()){
+                desc = Float.parseFloat(tfDes.getText().replace(",", "."));
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Insira apenas números válidos.");
+            return;
+        }
+        
+        if (vlU > 0 && qtd > 0 && vlT == 0) {
+            vlT = vlU * qtd;
+        } else if (vlU == 0 && qtd > 0 && vlT > 0) {
+            vlU = vlT / qtd;
+        } else if (vlU > 0 && qtd == 0 && vlT > 0) {
+            qtd = vlT / vlU;
+        }
+        float vlrTFinal = vlT;
+        if (desc > 0) {
+            vlrTFinal = vlT * (1 - desc / 100);
+        }
+        
+        tfValor.setText(String.format("%.2f", vlU));
+        tfQuantia.setText(String.format("%.2f", qtd));
+        tfValorTotal.setText(String.format("%.2f", vlrTFinal));
+        tfDes.setText(desc+"");
     }
 
     /**
@@ -54,10 +300,14 @@ public class Menu extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         tfValorTotal = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
-        tfCancela = new javax.swing.JButton();
+        btCancela = new javax.swing.JButton();
         tfFinaliza = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbConsulta = new javax.swing.JTable();
+        jLabel12 = new javax.swing.JLabel();
+        tfId = new javax.swing.JTextField();
+        btExcluir = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jmCadPessoa = new javax.swing.JMenuItem();
@@ -89,6 +339,11 @@ public class Menu extends javax.swing.JFrame {
         jLabel5.setText("L :");
 
         btCalcular.setText("Calcular");
+        btCalcular.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btCalcularActionPerformed(evt);
+            }
+        });
 
         jLabel6.setText("Cliente:");
 
@@ -110,11 +365,46 @@ public class Menu extends javax.swing.JFrame {
 
         jLabel11.setText("R$:");
 
-        tfCancela.setText("Cancelar");
+        btCancela.setText("Cancelar");
+        btCancela.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btCancelaActionPerformed(evt);
+            }
+        });
 
         tfFinaliza.setText("Finalizar");
+        tfFinaliza.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfFinalizaActionPerformed(evt);
+            }
+        });
 
+        tbConsulta.setModel(tmConsulta);
         jScrollPane1.setViewportView(tbConsulta);
+
+        jLabel12.setText("ID:");
+
+        tfId.setEditable(false);
+        tfId.setBorder(null);
+        tfId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfIdActionPerformed(evt);
+            }
+        });
+
+        btExcluir.setText("Excluir");
+        btExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btExcluirActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("Atualizar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("File");
 
@@ -176,59 +466,74 @@ public class Menu extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(cbCliente, javax.swing.GroupLayout.Alignment.LEADING, 0, 172, Short.MAX_VALUE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(cbBomba, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jLabel6))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel2)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel3)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(tfValor, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGap(19, 19, 19)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel5)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(tfQuantia, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(34, 34, 34)
+                                                .addComponent(btCalcular))
+                                            .addComponent(jLabel4)))
+                                    .addComponent(jLabel7)
+                                    .addComponent(tfObs)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(cbCliente, javax.swing.GroupLayout.Alignment.LEADING, 0, 172, Short.MAX_VALUE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(cbBomba, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addComponent(jLabel6))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel2)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel3)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(tfValor, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGap(19, 19, 19)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel5)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(tfQuantia, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(34, 34, 34)
-                                            .addComponent(btCalcular))
-                                        .addComponent(jLabel4)))
-                                .addComponent(jLabel7)
-                                .addComponent(tfObs)))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(tfDes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
-                                .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel9)
-                            .addGap(39, 39, 39)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel11)
-                                    .addGap(1, 1, 1)
-                                    .addComponent(tfValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(tfCancela)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(tfFinaliza))
-                                .addComponent(jLabel10)))))
+                                    .addComponent(tfDes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel9)
+                                .addGap(39, 39, 39)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel11)
+                                        .addGap(1, 1, 1)
+                                        .addComponent(tfValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btExcluir)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(btCancela)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(tfFinaliza))
+                                    .addComponent(jLabel10))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(27, 27, 27)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
@@ -259,11 +564,12 @@ public class Menu extends javax.swing.JFrame {
                     .addComponent(jLabel9)
                     .addComponent(tfValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11)
-                    .addComponent(tfCancela)
-                    .addComponent(tfFinaliza))
+                    .addComponent(btCancela)
+                    .addComponent(tfFinaliza)
+                    .addComponent(btExcluir))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();
@@ -296,6 +602,30 @@ public class Menu extends javax.swing.JFrame {
     private void tfValorTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfValorTotalActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tfValorTotalActionPerformed
+
+    private void btCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelaActionPerformed
+        limparCampos();
+    }//GEN-LAST:event_btCancelaActionPerformed
+
+    private void tfFinalizaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfFinalizaActionPerformed
+        finalizar();
+    }//GEN-LAST:event_tfFinalizaActionPerformed
+
+    private void btCalcularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCalcularActionPerformed
+        calcular();
+    }//GEN-LAST:event_btCalcularActionPerformed
+
+    private void tfIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfIdActionPerformed
+
+    }//GEN-LAST:event_tfIdActionPerformed
+
+    private void btExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcluirActionPerformed
+        excluir();
+    }//GEN-LAST:event_btExcluirActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        listar();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void cadastrarPessoa(){
         CadPessoas pessoa = new CadPessoas();
@@ -384,11 +714,15 @@ public class Menu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btCalcular;
+    private javax.swing.JButton btCancela;
+    private javax.swing.JButton btExcluir;
     private javax.swing.JComboBox<String> cbBomba;
     private javax.swing.JComboBox<String> cbCliente;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -408,9 +742,9 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jmPdv;
     private javax.swing.JMenuItem jmUsu;
     private javax.swing.JTable tbConsulta;
-    private javax.swing.JButton tfCancela;
     private javax.swing.JTextField tfDes;
     private javax.swing.JButton tfFinaliza;
+    private javax.swing.JTextField tfId;
     private javax.swing.JTextField tfObs;
     private javax.swing.JTextField tfQuantia;
     private javax.swing.JTextField tfValor;

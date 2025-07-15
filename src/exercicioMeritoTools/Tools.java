@@ -43,9 +43,6 @@ public class Tools {
         String sql =  "SELECT MAX(\n"
                 + sql1 + ")\n"
                 + " AS ultimo_id FROM " + sql2;
-        
-            sql = "SELECT MAX(bb_id) AS ultimo_id FROM tb_bomba";
-
         try {
             PreparedStatement pstm  = conn.prepareStatement(sql);
             ResultSet rs = pstm.executeQuery();
