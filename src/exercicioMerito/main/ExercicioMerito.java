@@ -1,7 +1,5 @@
 package exercicioMerito.main;
 
-
-
 import java.sql.Connection;
 import exercicioMeritoConnections.Conexao;
 import exercicioMeritoSwing.Login;

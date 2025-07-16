@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package exercicioMeritoSwing;
 
 import exercicioMeritoBeans.ProdutoBean;
@@ -186,6 +182,7 @@ public class CadProdutos extends javax.swing.JFrame {
     }//GEN-LAST:event_btExcluirActionPerformed
 
     private void btAdcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAdcActionPerformed
+        limparCampos();
         habilitarCampos();
     }//GEN-LAST:event_btAdcActionPerformed
 

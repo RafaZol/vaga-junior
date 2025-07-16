@@ -1,12 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package exercicioMeritoControls;
 
 import exercicioMeritoBeans.PessoaBean;
 import exercicioMeritoBeans.UserBean;
-import exercicioMeritoConnections.Conexao;
 import java.sql.Connection;
 import javax.swing.JOptionPane;
 import exercicioMeritoConnections.Conexao;
@@ -49,7 +44,7 @@ public class PessoaControl {
             + " usu_name,\n"
             + " usu_pass,\n"
             + " tb_pessoa_id,\n"
-            + " usu_ud)\n"
+            + " usu_id)\n"
             + " VALUES (?, ?, ?, ?)";
     
     private String sql_update_user = "UPDATE users SET\n"

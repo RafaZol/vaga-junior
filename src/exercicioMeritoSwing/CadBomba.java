@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package exercicioMeritoSwing;
 
 import exercicioMeritoBeans.BombaBean;
@@ -94,7 +90,7 @@ public class CadBomba extends javax.swing.JFrame {
                 tfId.setText(bombas.get(ls).getId()+"");
                 for(int i = 0; i < produtos.size(); i++){
                     ProdutoBean get = produtos.get(i);
-                    if(get.getId()== bombas.get(i).getCombustivel()){
+                    if(get.getId()== produtos.get(ls).getId()){
                         cbCombustivel.setSelectedIndex(i);
                         break;
                     }    
@@ -213,6 +209,7 @@ public class CadBomba extends javax.swing.JFrame {
     }//GEN-LAST:event_btExcluirActionPerformed
 
     private void btAdcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAdcActionPerformed
+        limparCampos();
         habilitarCampos();
     }//GEN-LAST:event_btAdcActionPerformed
 

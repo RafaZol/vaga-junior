@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package exercicioMeritoSwing;
 
 import exercicioMeritoBeans.BombaBean;
@@ -16,6 +12,7 @@ import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -61,13 +58,13 @@ public class Menu extends javax.swing.JFrame {
         centralizado.setHorizontalAlignment(SwingConstants.CENTER);
         direita.setHorizontalAlignment(SwingConstants.RIGHT);
         
-        tbConsulta.getColumnModel().getColumn(0).setPreferredWidth(20);
+        tbConsulta.getColumnModel().getColumn(0).setPreferredWidth(10);
         tbConsulta.getColumnModel().getColumn(1).setPreferredWidth(20);
         tbConsulta.getColumnModel().getColumn(2).setPreferredWidth(20);
         tbConsulta.getColumnModel().getColumn(3).setPreferredWidth(20);
         tbConsulta.getColumnModel().getColumn(4).setPreferredWidth(20);
-        tbConsulta.getColumnModel().getColumn(5).setPreferredWidth(20);
-        tbConsulta.getColumnModel().getColumn(0).setCellRenderer(direita);
+        tbConsulta.getColumnModel().getColumn(5).setPreferredWidth(30);
+        tbConsulta.getColumnModel().getColumn(0).setCellRenderer(centralizado);
         tbConsulta.setAutoCreateRowSorter(true);
         tbConsulta.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -76,6 +73,7 @@ public class Menu extends javax.swing.JFrame {
         });
         
         bombas = produtoControl.listarSQL("SELECT * FROM tb_bomba", "sql");
+        produtos = produtoControl.listarSQL("SELECT * FROM tb_combustivel");
         cbBomba.removeAllItems();
         for(int i = 0; i < bombas.size(); i++){
             cbBomba.addItem("Bomba : " + bombas.get(i).getId());
@@ -103,12 +101,12 @@ public class Menu extends javax.swing.JFrame {
     }
     
     private boolean verificarCampos(){
-        if(cbBomba.getSelectedIndex() <= -1 && tfValor.getText().trim().isEmpty()
-                && tfQuantia.getText().trim().isEmpty() && tfValorTotal.getText().trim().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Preencha Todos os Campos obrigatorios corretamente");
-            return false;
+        if(cbBomba.getSelectedIndex() > -1 && !tfValor.getText().trim().isEmpty()
+                && !tfQuantia.getText().trim().isEmpty() && !tfValorTotal.getText().trim().isEmpty()){            
+            return true;
         }
-        return true;
+        JOptionPane.showMessageDialog(null, "Preencha Todos os Campos obrigatorios corretamente");
+        return false;
     }
     
     protected void tbConsultaLinhaSelecionada(JTable tb){
@@ -119,8 +117,7 @@ public class Menu extends javax.swing.JFrame {
                 tfQuantia.setText(movBean.get(ls).getQuantidade()+"");
                 tfObs.setText(movBean.get(ls).getObs());
                 tfDes.setText(movBean.get(ls).getDesconto()+"");
-                tfValorTotal.setText(movBean.get(ls).getValorTotal()+"");
-                produtos = produtoControl.listarSQL("SELECT * FROM tb_combustivel");
+                tfValorTotal.setText(movBean.get(ls).getValorTotal()+"");                
                 for(int i = 0; i < bombas.size(); i++){
                     BombaBean b = bombas.get(i);
                     if(b.getId() == movBean.get(ls).getBomba()){
@@ -138,7 +135,7 @@ public class Menu extends javax.swing.JFrame {
                 for(int i = 0; i < clientes.size(); i++){
                     PessoaBean p =clientes.get(i);
                     if(p.getId() == movBean.get(ls).getCliente()){
-                        cbCliente.setSelectedIndex(i);
+                        cbCliente.setSelectedIndex(i+1);
                         break;
                     }                    
                 }                                    
@@ -164,7 +161,10 @@ public class Menu extends javax.swing.JFrame {
             tmConsulta.setValueAt(lista.get(i).getValor(), i, 2);
             tmConsulta.setValueAt(lista.get(i).getQuantidade(), i, 3);
             tmConsulta.setValueAt(lista.get(i).getValorTotal(), i, 4);
-            tmConsulta.setValueAt(lista.get(i).getHora(), i, 5);
+            LocalDateTime data = lista.get(i).getHora();
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("HH:mm dd/MM/yy");
+            String dataF = data.format(formato);        
+            tmConsulta.setValueAt(dataF, i, 5);
         }
     }
     
@@ -204,7 +204,6 @@ public class Menu extends javax.swing.JFrame {
                 if (index > 0 && index <= clientes.size()) {
                     bean.setCliente(clientes.get(index - 1).getId());
                 }
-//                bean.setCliente(clientes.get(cbCliente.getSelectedIndex()).getId());
                 bean.setDesconto(Float.parseFloat(tfDes.getText().replace(",", ".")));
                 bean.setObs(tfObs.getText());                
                 if(tfId.getText().trim().isEmpty()){
@@ -316,13 +315,17 @@ public class Menu extends javax.swing.JFrame {
         jmCadProdutos = new javax.swing.JMenuItem();
         jmCadBombas = new javax.swing.JMenuItem();
         jmPdv = new javax.swing.JMenu();
-        jmPay = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setText("Bomba:");
 
         cbBomba.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbBomba.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbBombaActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Valor:");
 
@@ -447,15 +450,6 @@ public class Menu extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         jmPdv.setText("jMenu1");
-
-        jmPay.setText("PDV");
-        jmPay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jmPayActionPerformed(evt);
-            }
-        });
-        jmPdv.add(jmPay);
-
         jMenuBar1.add(jmPdv);
 
         setJMenuBar(jMenuBar1);
@@ -467,9 +461,9 @@ public class Menu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -509,21 +503,21 @@ public class Menu extends javax.swing.JFrame {
                                         .addComponent(jLabel11)
                                         .addGap(1, 1, 1)
                                         .addComponent(tfValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                                         .addComponent(btExcluir)
                                         .addGap(18, 18, 18)
                                         .addComponent(btCancela)
                                         .addGap(18, 18, 18)
                                         .addComponent(tfFinaliza))
                                     .addComponent(jLabel10))))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 150, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel12)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -569,7 +563,7 @@ public class Menu extends javax.swing.JFrame {
                     .addComponent(btExcluir))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
 
         pack();
@@ -582,10 +576,6 @@ public class Menu extends javax.swing.JFrame {
     private void jmCadProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmCadProdutosActionPerformed
         cadastraProduto();       
     }//GEN-LAST:event_jmCadProdutosActionPerformed
-
-    private void jmPayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmPayActionPerformed
-        // abrirPDV();
-    }//GEN-LAST:event_jmPayActionPerformed
 
     private void jmUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmUsuActionPerformed
         cadastrarUsuario();
@@ -626,6 +616,21 @@ public class Menu extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         listar();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void cbBombaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBombaActionPerformed
+        int selectedIndex = cbBomba.getSelectedIndex();
+        if (selectedIndex >= 0 && selectedIndex < bombas.size()) {
+            BombaBean bombaSelecionada = bombas.get(selectedIndex);
+            long idCombustivel = bombaSelecionada.getCombustivel();
+
+            for (ProdutoBean produto : produtos) {
+                if (produto.getId() == idCombustivel) {
+                    tfValor.setText(String.valueOf(produto.getValor()));
+                    break;
+                }
+            }
+        }
+    }//GEN-LAST:event_cbBombaActionPerformed
 
     private void cadastrarPessoa(){
         CadPessoas pessoa = new CadPessoas();
@@ -738,7 +743,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem jmCadBombas;
     private javax.swing.JMenuItem jmCadPessoa;
     private javax.swing.JMenuItem jmCadProdutos;
-    private javax.swing.JMenuItem jmPay;
     private javax.swing.JMenu jmPdv;
     private javax.swing.JMenuItem jmUsu;
     private javax.swing.JTable tbConsulta;

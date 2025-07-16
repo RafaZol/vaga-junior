@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package exercicioMeritoSwing;
 
 import exercicioMeritoBeans.PessoaBean;
@@ -27,7 +23,7 @@ public class CadUsu extends javax.swing.JFrame {
     private final PessoaControl pessoaControl = new PessoaControl();
     private DefaultTableModel tmConsulta = new DefaultTableModel(null, new String[]{"Nome", "Usuário", "ID de Usuário"});
     private ListSelectionModel lsmConsulta;
-    private List<PessoaBean> pessoas;
+    private final List<PessoaBean> clientes;
     private List<UserBean> users;
     private boolean inicializando;
     
@@ -59,15 +55,30 @@ public class CadUsu extends javax.swing.JFrame {
                tbConsultaLinhaSelecionada(tbConsultas);
             }
         });
+        
+        clientes = pessoaControl.listarSQL("SELECT * FROM tb_pessoas");
+        cbCliente.removeAllItems();
+        for(int i = 0; i < clientes.size(); i++){
+            cbCliente.addItem(clientes.get(i).getNome());
+        }
+        
         listar();
 
     }
     
     protected void tbConsultaLinhaSelecionada(JTable tb){
         try{
-            if(tb.getSelectedRow() != 1 && !inicializando){
+            if(tb.getSelectedRow() != -1 && !inicializando){
                 int ls = tbConsultas.convertRowIndexToModel(tb.getSelectedRow());
-                tfNome.setText(users.get(ls).getPessoa());
+                for(int i = 0; i < clientes.size(); i++){
+                    PessoaBean p = clientes.get(i);
+                    if(p.getId() == users.get(ls).getPessoaId()){
+                        cbCliente.setSelectedIndex(i);
+                        break;
+                    }
+                }
+                
+                
                 tfUsu.setText(users.get(ls).getNome());
                 tfId.setText(users.get(ls).getUserId()+"");
                 tfPessoaId.setText(users.get(ls).getPessoaId()+"");
@@ -81,10 +92,11 @@ public class CadUsu extends javax.swing.JFrame {
     }
     
     private boolean verificarCampos(){
-        if(tfNome.getText().trim().isEmpty() || tfUsu.getText().trim().isEmpty()){
-            return false;
+        if(cbCliente.getSelectedIndex() > -1 && !tfUsu.getText().trim().isEmpty()){
+            return true;
         }
-        return true;
+        JOptionPane.showMessageDialog(null, "Verifique os campos");
+        return false;
     }
     
     private void listar(){
@@ -139,7 +151,6 @@ public class CadUsu extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         Senha = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        tfNome = new javax.swing.JTextField();
         tfUsu = new javax.swing.JTextField();
         tfPass = new javax.swing.JTextField();
         tfPass2 = new javax.swing.JTextField();
@@ -149,6 +160,8 @@ public class CadUsu extends javax.swing.JFrame {
         btExcluir = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         tfPessoaId = new javax.swing.JTextField();
+        cbCliente = new javax.swing.JComboBox<>();
+        btAdc = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -162,8 +175,6 @@ public class CadUsu extends javax.swing.JFrame {
         Senha.setText("Senha:");
 
         jLabel4.setText("Confirmação de Senha:");
-
-        tfNome.setEditable(false);
 
         jLabel3.setText("ID de usuário");
 
@@ -185,6 +196,22 @@ public class CadUsu extends javax.swing.JFrame {
 
         jLabel5.setText("ID de Cliente");
 
+        tfPessoaId.setEditable(false);
+
+        cbCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbClienteActionPerformed(evt);
+            }
+        });
+
+        btAdc.setText("+");
+        btAdc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btAdcActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -192,55 +219,54 @@ public class CadUsu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btAdc, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(120, 120, 120)
+                                .addComponent(jLabel2))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(159, 159, 159)
+                                .addComponent(tfUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(Senha)
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                            .addComponent(tfNome, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(56, 56, 56)
-                                            .addComponent(tfUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(tfPass, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(jLabel4)
-                                                .addComponent(tfPass2, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(145, 145, 145)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                        .addComponent(cbCliente, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(tfPass, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(35, 35, 35)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(tfPass2, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel4))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(12, 12, 12)
-                                        .addComponent(jButton1)))
-                                .addGap(21, 21, 21)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btExcluir)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(tfPessoaId, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel5))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(35, 35, 35)))
+                                    .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(59, 59, 59))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel5)
+                            .addComponent(tfPessoaId, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btExcluir))
+                        .addGap(5, 5, 5)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(btAdc)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
@@ -248,10 +274,10 @@ public class CadUsu extends javax.swing.JFrame {
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tfUsu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfPessoaId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tfPessoaId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Senha)
@@ -262,7 +288,7 @@ public class CadUsu extends javax.swing.JFrame {
                     .addComponent(tfPass2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(btExcluir))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addGap(15, 15, 15))
         );
 
         pack();
@@ -276,6 +302,25 @@ public class CadUsu extends javax.swing.JFrame {
         excluir();
     }//GEN-LAST:event_btExcluirActionPerformed
 
+    private void cbClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbClienteActionPerformed
+        int selectedIndex = cbCliente.getSelectedIndex();
+        if (selectedIndex >= 0 && selectedIndex < clientes.size()) {
+            PessoaBean pessocaSelec = clientes.get(selectedIndex);
+            long idCliente = pessocaSelec.getId();
+
+            for (PessoaBean pessoa : clientes) {
+                if (pessoa.getId() == idCliente) {
+                    tfPessoaId.setText(pessoa.getId()+"");
+                    break;
+                }
+            }
+        }
+    }//GEN-LAST:event_cbClienteActionPerformed
+
+    private void btAdcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAdcActionPerformed
+       limparCampos();
+    }//GEN-LAST:event_btAdcActionPerformed
+
     private void salvar(){
         if(verificarCampos()){
             try{
@@ -283,7 +328,7 @@ public class CadUsu extends javax.swing.JFrame {
                 user.setNome(tfUsu.getText());
                 user.setPessoaId(Long.parseLong(tfPessoaId.getText()));                
                 if(tfId.getText().trim().isEmpty()){
-                    if(tfPass.getText().trim() == tfPass2.getText().trim() && !tfPass.getText().trim().isEmpty()){
+                    if(tfPass.getText().trim().equals(tfPass2.getText().trim())){
                         String pass = Tools.Cripto(tfPass.getText().trim());
                         user.setPass(pass);                        
                         user.setUserId(Tools.gerarId("usu_id","users"));
@@ -297,6 +342,7 @@ public class CadUsu extends javax.swing.JFrame {
                     pessoaControl.alteraUser(user);
                     limparCampos();
                 }
+                listar();
             } catch (Exception ex){
                 ex.printStackTrace();
             }
@@ -314,7 +360,7 @@ public class CadUsu extends javax.swing.JFrame {
     private void limparCampos(){
         tfId.setText("");
         tfPessoaId.setText("");
-        tfNome.setText("");
+        cbCliente.setSelectedIndex(0);
         tfUsu.setText("");
         tfPass.setText("");
         tfPass2.setText("");
@@ -356,7 +402,9 @@ public class CadUsu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Senha;
+    private javax.swing.JButton btAdc;
     private javax.swing.JButton btExcluir;
+    private javax.swing.JComboBox<String> cbCliente;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -366,7 +414,6 @@ public class CadUsu extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tbConsultas;
     private javax.swing.JTextField tfId;
-    private javax.swing.JTextField tfNome;
     private javax.swing.JTextField tfPass;
     private javax.swing.JTextField tfPass2;
     private javax.swing.JTextField tfPessoaId;

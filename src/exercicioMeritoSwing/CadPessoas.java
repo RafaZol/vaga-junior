@@ -1,11 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package exercicioMeritoSwing;
 
 import exercicioMeritoBeans.PessoaBean;
-import exercicioMeritoConnections.Conexao;
 import exercicioMeritoControls.PessoaControl;
 import exercicioMeritoTools.Tools;
 import java.awt.Toolkit;
@@ -20,7 +15,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
- * @author Victória
+ * @author Rafael
  */
 public class CadPessoas extends javax.swing.JFrame {
     
@@ -271,7 +266,8 @@ public class CadPessoas extends javax.swing.JFrame {
     }//GEN-LAST:event_btExcluirActionPerformed
 
     private void btAdcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAdcActionPerformed
-       habilitarCampos();
+        limparCampos();
+        habilitarCampos();
     }//GEN-LAST:event_btAdcActionPerformed
 
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
