@@ -1,0 +1,6 @@
+tipoConexao=postgresql
+host=localhost
+porta=5432
+banco=merito
+usuario=postgres
+senha=5432
